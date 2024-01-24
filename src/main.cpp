@@ -154,6 +154,8 @@ void theFunctionThatDisplaysStuffOnTheScreen()
     s.setCursor(12, 1);
     if (!motor_l1.installed())
       s.setFillColor(color().red);
+    else if (vexDeviceMotorOverTempFlagGet(vexDeviceGetByIndex(motor_l1.index())))
+      s.setFillColor(color().orange);
     s.print("m1:");
     s.setFillColor(color().transparent);
     s.print(motor_l1.voltage());
@@ -161,6 +163,8 @@ void theFunctionThatDisplaysStuffOnTheScreen()
     s.setCursor(14, 1);
     if (!motor_l2.installed())
       s.setFillColor(color().red);
+    else if(vexDeviceMotorOverTempFlagGet(vexDeviceGetByIndex(motor_l2.index())))
+      s.setFillColor(color().orange);
     s.print("m2:");
     s.setFillColor(color().transparent);
     s.print(motor_l2.voltage());
@@ -168,6 +172,8 @@ void theFunctionThatDisplaysStuffOnTheScreen()
     s.setCursor(15, 1);
     if (!motor_l3.installed())
       s.setFillColor(color().red);
+    else if (vexDeviceMotorOverTempFlagGet(vexDeviceGetByIndex(motor_l3.index())))
+      s.setFillColor(color().orange);
     s.print("m3:");
     s.setFillColor(color().transparent);
     s.print(motor_l3.voltage());
@@ -175,6 +181,8 @@ void theFunctionThatDisplaysStuffOnTheScreen()
     s.setCursor(12, 12);
     if (!motor_r1.installed())
       s.setFillColor(color().red);
+    else if (vexDeviceMotorOverTempFlagGet(vexDeviceGetByIndex(motor_r1.index())))
+      s.setFillColor(color().orange);
     s.print("m4:");
     s.setFillColor(color().transparent);
     s.print(motor_r1.voltage());
@@ -182,6 +190,8 @@ void theFunctionThatDisplaysStuffOnTheScreen()
     s.setCursor(14, 12);
     if (!motor_r2.installed())
       s.setFillColor(color().red);
+    else if (vexDeviceMotorOverTempFlagGet(vexDeviceGetByIndex(motor_r2.index())))
+      s.setFillColor(color().orange);
     s.print("m5:");
     s.setFillColor(color().transparent);
     s.print(motor_r2.voltage());
@@ -189,6 +199,8 @@ void theFunctionThatDisplaysStuffOnTheScreen()
     s.setCursor(15, 12);
     if (!motor_r3.installed())
       s.setFillColor(color().red);
+    else if (vexDeviceMotorOverTempFlagGet(vexDeviceGetByIndex(motor_r3.index())))
+      s.setFillColor(color().orange);
     s.print("m6:");
     s.setFillColor(color().transparent);
     s.print(motor_r3.voltage());
@@ -231,7 +243,7 @@ void sbob()
       Brain.Screen.render();
       if (!result)
         break;
-      i += 2;
+      i += 2;    
     }
   }
 }
