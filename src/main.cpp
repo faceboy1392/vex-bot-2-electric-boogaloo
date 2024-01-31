@@ -47,7 +47,7 @@ Drive chassis(
     motor_group(motor_r1, motor_r2, motor_r3),
 
     // Specify the PORT NUMBER of your inertial sensor, in PORT format (i.e. "PORT1", not simply "1"):
-    PORT5,
+    PORT16,
 
     // Input your wheel diameter. (4" omnis are actually closer to 4.125"):
     3.25,
@@ -412,23 +412,83 @@ void pre_auton(void)
 
   leftDrive.setStopping(coast);
   rightDrive.setStopping(coast);
+  kicker.setStopping(brake);
+  intake.setVelocity(100, percent);
 
-  autonSelector();
+  // thread(autonSelector).detach();
 
   // thread(sbob).detach();
-  thread(theFunctionThatDisplaysStuffOnTheScreen).detach();
+  // thread(theFunctionThatDisplaysStuffOnTheScreen).detach();
 }
 
 void autonomous(void)
 {
 }
 
+bool kickerToggle = false;
+void toggleKicker() {
+  bool oldValue = kickerToggle;
+  kickerToggle = !oldValue;
+}
+
+void collision(axisType axis, double a, double b, double c) {
+  Controller.rumble(".");
+}
+
 void usercontrol(void)
 {
-  // Controller.ButtonX.pressed([]() { wings.set(!wings.value()); });
+  Controller.ButtonX.pressed([]()
+                             { wings.set(!wings.value()); });
+  Controller.ButtonUp.pressed(toggleKicker);
+  imu.collision(collision);
   while (1)
   {
-    chassis.control_arcade();
+    bool isKicking = Controller.ButtonDown.pressing() || kickerToggle;
+
+    double dr = Controller.Axis3.value() / 127.0,
+           st = (Controller.Axis1.value() / 127.0) 
+            * (Controller.ButtonR2.pressing() ? 1.0 : 0.4)
+            * (isKicking ? 0.3 : 1.0);
+    double left = dr + st,
+           right = dr - st,
+           m = max(1.0, max(abs(left), abs(right)));
+    left /= m;
+    right /= m;
+
+    // leftDrive.spin(forward, left*12.0, volt);
+    // rightDrive.spin(forward, right*12.0, volt);
+    if (left != 0.0) {
+      leftDrive.setVelocity(left * 100.0, percent);
+      leftDrive.spin(forward);
+    }
+    else leftDrive.stop();
+    if (right != 0.0) {
+      rightDrive.setVelocity(right * 100.0, percent);
+      rightDrive.spin(forward);
+    }
+    else rightDrive.stop();
+
+    if (Controller.ButtonL1.pressing())
+      intake.spin(forward);
+    else if (Controller.ButtonL2.pressing())
+      intake.spin(reverse);
+    else
+      intake.stop();
+
+    if (Controller.ButtonDown.pressing() && kickerToggle)
+      kicker.spin(forward, 100, percent);
+    else if (isKicking)
+      kicker.spin(forward, 85, percent);
+    else
+      kicker.stop();
+
+    if (Controller.ButtonR1.pressing()) {
+      leftDrive.setStopping(hold);
+      rightDrive.setStopping(hold);
+    } else {
+      leftDrive.setStopping(brake);
+      rightDrive.setStopping(brake);
+    }
 
     wait(20, msec);
   }
